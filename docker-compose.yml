@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  postgresdb:
+    image: postgres:15-alpine
+    container_name: mcasa_postgresdb
+    environment:
+      POSTGRES_USER: mcasa
+      POSTGRES_PASSWORD: mcasa
+      POSTGRES_DB: mcasadb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker-volumes/postgres:/var/lib/postgresql/data
