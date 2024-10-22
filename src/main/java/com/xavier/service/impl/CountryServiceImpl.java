@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -38,19 +37,20 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public List<CountryDTO> findAll() {
-        List<Country> countries = countryRepository.findAll().list();
-        return countries.stream()
-                .map(this::toDTO)
-                .toList();
+        
+        return countryRepository
+               .findAll()
+               .stream()
+               .map(this::toDTO)
+               .toList();
     }
 
     @Override
     public CountryDTO findById(Long id) {
-        Optional<Country> countryOptional = countryRepository.findByIdOptional(id);
-        if (!countryOptional.isPresent()) {
-            throw new ServiceException("Country not found");
-        }
-        return toDTO(countryOptional.get());
+        return countryRepository
+               .findByIdOptional(id)
+               .map(this::toDTO)
+               .orElseThrow(() -> new ServiceException("Country not found"));
     }
 
     @Override
@@ -61,13 +61,11 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @Transactional
-    public CountryDTO update(CountryDTO countryDTO) {
-        Optional<Country> countryOptional = countryRepository.findByIdOptional(countryDTO.getId());
-        if (!countryOptional.isPresent()) {
-            throw new ServiceException("Country not found");
-        }
-        Country country = countryOptional.get();
-        countryRepository.persist(toEntity(countryDTO));
+    public CountryDTO update(Long id, @Valid CountryDTO countryDTO) {
+        Country country = countryRepository.findByIdOptional(id)
+                   .orElseThrow(() -> new ServiceException("Country not found"));
+        country.setName(countryDTO.getName());
+        countryRepository.persist(country);
         return toDTO(country);
     }
 
@@ -79,7 +77,7 @@ public class CountryServiceImpl implements CountryService {
         countryRepository.delete(country);
     }
 
-    private CountryDTO toDTO(Country country) {
+    /* private CountryDTO toDTO(Country country) {
         CountryDTO countryDTO = new CountryDTO();
         try {
             BeanUtils.copyProperties(countryDTO, country);
@@ -87,6 +85,13 @@ public class CountryServiceImpl implements CountryService {
             throw new ServiceException("Error converting Country to CountryDTO", e);
         }
         return countryDTO;
+    } */
+
+    private CountryDTO toDTO(Country country) {
+        return CountryDTO.builder()
+               .id(country.getId())
+               .name(country.getName())
+               .build();
     }
 
     private Country toEntity(CountryDTO countryDTO) {

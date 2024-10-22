@@ -3,6 +3,7 @@ package com.xavier.resource;
 
 import java.util.List;
 
+import com.xavier.constants.Routes;
 import com.xavier.dto.BusinessTypeDTO;
 import com.xavier.service.BusinessTypeService;
 
@@ -18,7 +19,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/api/v1/business-types")
+@Path(Routes.BUSINESS_TYPES)
 public class BusinessTypeResource {
     
     @Inject
@@ -29,33 +30,40 @@ public class BusinessTypeResource {
 
     public Response createBusinessType(@Valid BusinessTypeDTO businessTypeDTO) throws Exception{
         businessTypeService.createBusinessType(businessTypeDTO);
-        return Response.status(Response.Status.CREATED).build();
+        return Response.status(Response.Status.CREATED).entity(businessTypeDTO).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BusinessTypeDTO> getAllBusinessTypes() {
-        return businessTypeService.getAllBusinessTypes();
+    public Response getAllBusinessTypes() {
+        return Response.ok(businessTypeService.getAllBusinessTypes()).build();
         
     }
 
     @GET
-    @Path("/{description}")
+    @Path(Routes.BUSINESS_TYPE)
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BusinessTypeDTO> getBusinessTypeByDescription(@PathParam("description")  String description) {
-        return businessTypeService.findByDescription(description);
+    public Response findById(@PathParam("id") Long id) {
+        return Response.ok(businessTypeService.getBusinessTypeById(id)).build();
+    }
+
+    @GET
+    @Path(Routes.BUSINESS_TYPE_BY_DESCRIPTION)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBusinessTypeByDescription(@PathParam("description")  String description) {
+        return Response.ok(businessTypeService.findByDescription(description)).build();
        
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path(Routes.BUSINESS_TYPE)
     public Response deleteBusinessType(@PathParam("id") Long id) {
         businessTypeService.deleteBusinessType(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @PUT
-    @Path("/{id}")
+    @Path(Routes.BUSINESS_TYPE)
     public Response updateBusinessType(@PathParam("id") Long id, @Valid BusinessTypeDTO businessTypeDTO) {
         businessTypeService.updateBusinessType(id, businessTypeDTO);
         return Response.status(Response.Status.OK).build();
