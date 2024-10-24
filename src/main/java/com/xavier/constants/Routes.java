@@ -33,6 +33,12 @@ public final class Routes {
     public static final String USER = "/{id}";
     public static final String USER_BY_EMAIL = "/{email}";
 
+    /**
+     * Property type routes
+     */
 
+    public static final String PROPERTY_TYPES = "/api/v1/property-types";   
+    public static final String PROPERTY_TYPE = "/{id}";
+    public static final String PROPERTY_TYPE_BY_DESCRIPTION = "/{description}";
 
 }
